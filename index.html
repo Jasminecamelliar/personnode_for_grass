@@ -380,11 +380,20 @@
     </div>
 
     <script>
-      // --- 1. 密码解锁逻辑 (密码: caocao) ---
+      // --- 1. 核心逻辑：密码与记忆 ---
       const lockScreen = document.getElementById("lock-screen");
       const mainApp = document.getElementById("main-app");
       const pwdInput = document.getElementById("pwdInput");
       const msg = document.getElementById("msg");
+
+      // 🟢 新增：一进来先检查是否有“通行证”
+      if (sessionStorage.getItem("is_unlocked") === "true") {
+        // 如果有，直接隐藏锁屏，显示主页（无动画，瞬间显示）
+        lockScreen.style.display = "none";
+        mainApp.style.display = "block";
+        mainApp.style.opacity = "1";
+        mainApp.style.transform = "scale(1)";
+      }
 
       pwdInput.addEventListener("keyup", function (e) {
         if (e.key === "Enter") {
@@ -394,25 +403,24 @@
 
       function checkPassword() {
         if (pwdInput.value === "caocao") {
-          // 这里修改密码
-          // 解锁成功动画
+          // 🟢 新增：密码正确，发放“通行证”
+          sessionStorage.setItem("is_unlocked", "true");
+
+          // 解锁动画
           lockScreen.style.opacity = "0";
           lockScreen.style.transform = "scale(1.1)";
 
           setTimeout(() => {
             lockScreen.style.display = "none";
             mainApp.style.display = "block";
-            // 稍微延时让 mainApp 准备好过渡
             setTimeout(() => {
               mainApp.style.opacity = "1";
               mainApp.style.transform = "scale(1)";
             }, 50);
           }, 600);
         } else {
-          // 密码错误动画
           msg.style.opacity = "1";
           pwdInput.style.borderColor = "#ff453a";
-          pwdInput.classList.add("shake"); // 可以加个抖动效果
           setTimeout(() => {
             msg.style.opacity = "0";
             pwdInput.style.borderColor = "rgba(255, 255, 255, 0.1)";
@@ -420,7 +428,13 @@
         }
       }
 
-      // --- 2. 博客数据 (在这里写日记) ---
+      // 🟢 新增：手动重新上锁功能 (你可以绑定到某个按钮上)
+      function reLock() {
+        sessionStorage.removeItem("is_unlocked");
+        location.reload(); // 刷新页面，重新进入锁屏
+      }
+
+      // --- 2. 博客数据 ---
       const blogData = [
         {
           date: "2025.12.03",
@@ -439,8 +453,7 @@
         },
       ];
 
-      // --- 3. 家庭相册配置 ---
-      // 对应 assets/family/ 文件夹里的 6 张 png
+      // --- 3. 家庭相册配置 (6张) ---
       const familyPhotos = [
         "assets/family/photo1.png",
         "assets/family/photo2.png",
@@ -450,30 +463,34 @@
         "assets/family/photo6.png",
       ];
 
-      // --- 4. 渲染逻辑 (自动生成页面) ---
+      // --- 4. 渲染逻辑 ---
       const blogContainer = document.getElementById("blog-container");
       const familyContainer = document.getElementById("family-container");
 
-      // 生成博客列表
-      blogData.forEach((post) => {
-        const imgHtml = post.image
-          ? `<img src="${post.image}" class="blog-img" loading="lazy">`
-          : "";
-        const html = `
-                <div class="blog-item">
-                    <span class="blog-date">${post.date}</span>
-                    <p class="blog-content">${post.content}</p>
-                    ${imgHtml}
-                </div>
-            `;
-        blogContainer.innerHTML += html;
-      });
+      if (blogContainer) {
+        // 防止报错检测
+        blogData.forEach((post) => {
+          const imgHtml = post.image
+            ? `<img src="${post.image}" class="blog-img" loading="lazy">`
+            : "";
+          const html = `
+                    <div class="blog-item">
+                        <span class="blog-date">${post.date}</span>
+                        <p class="blog-content">${post.content}</p>
+                        ${imgHtml}
+                    </div>
+                `;
+          blogContainer.innerHTML += html;
+        });
+      }
 
-      // 生成相册网格
-      familyPhotos.forEach((src) => {
-        const html = `<div class="photo-frame" style="background-image: url('${src}')"></div>`;
-        familyContainer.innerHTML += html;
-      });
+      if (familyContainer) {
+        // 防止报错检测
+        familyPhotos.forEach((src) => {
+          const html = `<div class="photo-frame" style="background-image: url('${src}')"></div>`;
+          familyContainer.innerHTML += html;
+        });
+      }
     </script>
   </body>
 </html>
