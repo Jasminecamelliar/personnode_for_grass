@@ -198,6 +198,7 @@
         }
       }
     </style>
+    <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
   </head>
   <body>
     <div class="nav-header">
@@ -224,16 +225,9 @@
           </button>
         </div>
 
-        <div class="comment-section">
+        <div class="interaction-area" style="margin-top: 50px">
           <h3>Comments</h3>
-          <textarea
-            id="commentInput"
-            class="comment-input"
-            placeholder="写下你的想法... (保存在本地)"
-          ></textarea>
-          <button onclick="addComment()" class="submit-btn">发送</button>
-
-          <ul id="commentList" class="comment-list"></ul>
+          <div id="vcomments"></div>
         </div>
       </div>
     </article>
@@ -275,40 +269,15 @@
       });
 
       // --- 2. 评论功能 (本地存储版) ---
-      const commentInput = document.getElementById("commentInput");
-      const commentList = document.getElementById("commentList");
-
-      // 加载历史评论
-      const savedComments = JSON.parse(
-        localStorage.getItem("blog_comments") || "[]"
-      );
-
-      function renderComments() {
-        commentList.innerHTML = "";
-        savedComments.forEach((c) => {
-          const li = document.createElement("li");
-          li.className = "comment-item";
-          li.innerHTML = `<span class="comment-date">${c.date}</span>${c.text}`;
-          commentList.prepend(li); // 新评论在最上面
-        });
-      }
-      renderComments();
-
-      function addComment() {
-        const text = commentInput.value.trim();
-        if (!text) return;
-
-        const newComment = {
-          text: text,
-          date: new Date().toLocaleString(),
-        };
-
-        savedComments.push(newComment);
-        localStorage.setItem("blog_comments", JSON.stringify(savedComments));
-
-        commentInput.value = ""; // 清空输入框
-        renderComments(); // 重新渲染
-      }
+      // --- 启动 Valine 云评论系统 ---
+      new Valine({
+        el: "#vcomments", // 对应上面的 id
+        appId: "你的AppID", // 🔴 请去 LeanCloud 复制粘贴过来
+        appKey: "你的AppKey", // 🔴 请去 LeanCloud 复制粘贴过来
+        placeholder: "欢迎留下你的看法...", // 输入框占位符
+        avatar: "monsterid", // 头像风格 (可以是 mp, identicon, monsterid, wavatar)
+        visitor: true, // 阅读量统计
+      });
     </script>
   </body>
 </html>

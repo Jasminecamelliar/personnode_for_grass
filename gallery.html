@@ -1,90 +1,98 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gallery - CaoCao</title>
     <style>
-        :root {
-            --bg-color: #000000;
-            --text-primary: #f5f5f7;
-            --accent: #2997ff;
-        }
+      :root {
+        --bg-color: #000000;
+        --text-primary: #f5f5f7;
+        --accent: #2997ff;
+      }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: -apple-system, sans-serif;
-            margin: 0;
-            padding: 40px;
-        }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        font-family: -apple-system, sans-serif;
+        margin: 0;
+        padding: 40px;
+      }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        
-        .header h1 { margin: 0; font-size: 28px; }
-        .close-btn { 
-            color: var(--text-primary); 
-            text-decoration: none; 
-            font-size: 24px; 
-            background: rgba(255,255,255,0.1);
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+      }
 
-        /* 瀑布流网格 */
-        .gallery-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      .close-btn {
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 24px;
+        background: rgba(255, 255, 255, 0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .photo-item {
-            width: 100%;
-            border-radius: 12px;
-            cursor: zoom-in;
-            transition: transform 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+      /* 瀑布流网格 */
+      .gallery-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+      }
 
-        .photo-item:hover { transform: scale(1.02); filter: brightness(1.1); }
+      .photo-item {
+        width: 100%;
+        border-radius: 12px;
+        cursor: zoom-in;
+        transition: transform 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        /* 简单的点击放大效果 (全屏) */
-        .photo-item:active {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            width: 90vw;
-            height: auto;
-            max-height: 90vh;
-            z-index: 1000;
-            border: none;
-            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.9);
-            cursor: zoom-out;
-            object-fit: contain;
-        }
+      .photo-item:hover {
+        transform: scale(1.02);
+        filter: brightness(1.1);
+      }
+
+      /* 简单的点击放大效果 (全屏) */
+      .photo-item:active {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1);
+        width: 90vw;
+        height: auto;
+        max-height: 90vh;
+        z-index: 1000;
+        border: none;
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.9);
+        cursor: zoom-out;
+        object-fit: contain;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div class="header">
-        <h1>Family & Life</h1>
-        <a href="index.html" class="close-btn">×</a>
+      <h1>Family & Life</h1>
+      <a href="index.html" class="close-btn">×</a>
     </div>
 
     <div class="gallery-container">
-        <img src="assets/family/1.png" class="photo-item">
-        <img src="assets/family/2.png" class="photo-item">
-        <img src="assets/family/3.png" class="photo-item">
-        <img src="assets/family/4.png" class="photo-item">
-        <img src="assets/family/5.png" class="photo-item">
-        <img src="assets/family/6.png" class="photo-item">
-        </div>
-
-</body>
+      <img src="assets/family/photo1.png" class="photo-item" />
+      <img src="assets/family/photo2.png" class="photo-item" />
+      <img src="assets/family/photo3.png" class="photo-item" />
+      <img src="assets/family/photo4.png" class="photo-item" />
+      <img src="assets/family/photo5.png" class="photo-item" />
+      <img src="assets/family/photo6.png" class="photo-item" />
+    </div>
+  </body>
 </html>
