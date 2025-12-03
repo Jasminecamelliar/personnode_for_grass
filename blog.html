@@ -3,280 +3,414 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blog - CaoCao</title>
+    <title>构建我的个人数字花园 - CaoCao</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css"/>
+    
     <style>
+      /* --- 1. 全局变量与重置 --- */
       :root {
-        --bg-color: #000000;
-        --card-bg: rgba(28, 28, 30, 0.65);
+        --bg-color: #050507; /* 更深邃的黑 */
+        --card-bg: rgba(30, 30, 32, 0.6);
+        --card-border: rgba(255, 255, 255, 0.08);
         --text-primary: #f5f5f7;
         --text-secondary: #86868b;
-        --accent: #2997ff;
-        --blur: 30px;
+        --accent: #2997ff; /* Apple Blue */
+        --accent-glow: rgba(41, 151, 255, 0.4);
+        --danger: #ff3b30;
+        
+        /* 字体系统 */
+        --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
-          sans-serif;
+        font-family: var(--font-stack);
         background-color: var(--bg-color);
+        /* 增加极细微的背景渐变，提升质感 */
+        background-image: radial-gradient(circle at 50% 0%, #1a1a2e 0%, #000000 70%);
         color: var(--text-primary);
-        margin: 0;
-        padding: 40px 20px;
         min-height: 100vh;
+        padding: 40px 20px;
+        line-height: 1.6;
+        overflow-x: hidden;
       }
 
-      /* --- 顶部导航 --- */
+      /* 选中文本颜色 */
+      ::selection {
+        background: var(--accent-glow);
+        color: white;
+      }
+
+      /* 滚动条美化 */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      /* --- 2. 布局组件 --- */
+      .container {
+        max-width: 720px; /* 稍微收窄，增加阅读沉浸感 */
+        margin: 0 auto;
+        opacity: 0; /* 初始隐藏，用于入场动画 */
+        animation: easeEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      /* 导航栏 */
       .nav-header {
-        max-width: 800px;
-        margin: 0 auto 40px;
+        margin-bottom: 40px;
         display: flex;
         align-items: center;
       }
 
       .back-btn {
-        color: var(--accent);
+        color: var(--text-secondary);
         text-decoration: none;
-        font-size: 16px;
-        display: flex;
+        font-size: 15px;
+        font-weight: 500;
+        display: inline-flex;
         align-items: center;
-        gap: 5px;
-        transition: 0.3s;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        backdrop-filter: blur(10px);
       }
+
       .back-btn:hover {
-        opacity: 0.8;
-        transform: translateX(-5px);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(-2px);
+      }
+      
+      .back-btn:active {
+        transform: scale(0.96);
       }
 
-      /* --- 文章容器 --- */
-      .article-container {
-        max-width: 800px;
-        margin: 0 auto;
-        animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      /* 封面图 */
+      /* --- 3. 文章主体 --- */
       .hero-img {
         width: 100%;
-        height: 300px;
-        background-color: #333;
-        border-radius: 20px;
-        margin-bottom: 30px;
-        background-image: url("assets/images/avatar.jpg"); /* 这里可以用你喜欢的任何大图 */
+        height: 320px;
+        background-color: #222;
+        border-radius: 24px;
+        margin-bottom: 40px;
+        background-image: url("assets/images/avatar.jpg"); /* 确保路径正确 */
         background-size: cover;
         background-position: center;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        /* 高级阴影和边框 */
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.05);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      /* 图片上的微光扫过效果 */
+      .hero-img::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+        opacity: 0.6;
       }
 
       h1 {
-        font-size: 32px;
+        font-size: 36px;
         font-weight: 700;
-        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+        background: linear-gradient(to bottom, #fff 0%, #ccc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.2;
       }
+
       .meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
         color: var(--text-secondary);
         font-size: 14px;
-        margin-bottom: 30px;
+        margin-bottom: 50px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
       }
-
-      /* 正文样式 */
-      .content {
-        font-size: 17px;
-        line-height: 1.8;
-        color: #e5e5e7;
-      }
-      .content p {
-        margin-bottom: 20px;
-      }
-
-      /* --- 互动区域 (点赞 & 评论) --- */
-      .interaction-area {
-        margin-top: 60px;
-        padding-top: 40px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      /* 点赞按钮 */
-      .like-btn-container {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-      .like-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: none;
-        color: white;
-        padding: 12px 30px;
-        border-radius: 50px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.3s;
-        display: inline-flex;
+      
+      .meta span {
+        display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
       }
-      .like-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: scale(1.05);
-      }
-      .like-btn.active {
-        background: #ff3b30;
-        color: white;
-      }
-      .heart-icon {
+
+      /* 正文排版 */
+      .content {
         font-size: 18px;
+        line-height: 1.85;
+        color: #e0e0e0;
+        font-weight: 400;
+      }
+      
+      .content p {
+        margin-bottom: 24px;
+      }
+      
+      /* --- 4. 互动区域 --- */
+      .interaction-area {
+        margin-top: 80px;
       }
 
-      /* 评论区 */
-      .comment-section h3 {
-        margin-bottom: 20px;
+      /* 点赞按钮 - 高级动效版 */
+      .like-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 60px;
       }
 
-      .comment-input {
-        width: 100%;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 15px;
-        border-radius: 12px;
-        color: white;
-        font-family: inherit;
-        resize: vertical;
-        min-height: 80px;
-        margin-bottom: 15px;
-      }
-      .comment-input:focus {
-        border-color: var(--accent);
-        outline: none;
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .submit-btn {
-        background: var(--accent);
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 8px;
+      .like-btn {
+        background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.08);
+        color: var(--text-primary);
+        padding: 14px 36px;
+        border-radius: 100px;
+        font-size: 16px;
+        font-weight: 500;
         cursor: pointer;
-        float: right;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
       }
 
-      .comment-list {
-        margin-top: 60px;
-        list-style: none;
-        padding: 0;
+      .like-btn .heart-icon {
+        font-size: 20px;
+        transition: 0.3s;
+        color: rgba(255,255,255,0.3);
       }
-      .comment-item {
+
+      .like-btn:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.4);
+      }
+
+      .like-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* 激活状态 */
+      .like-btn.active {
+        background: rgba(255, 59, 48, 0.15);
+        border-color: rgba(255, 59, 48, 0.3);
+        color: #ff453a;
+      }
+      
+      .like-btn.active .heart-icon {
+        color: #ff453a;
+        animation: heartBeat 0.6s ease-in-out;
+      }
+
+      /* 评论区容器美化 */
+      .comments-container {
         background: var(--card-bg);
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 15px;
-        animation: slideUp 0.3s ease;
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 30px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       }
-      .comment-date {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin-bottom: 5px;
-        display: block;
+      
+      .comments-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        padding-left: 10px;
+        border-left: 3px solid var(--accent);
       }
 
-      /* 动画 */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      /* --- Waline 自定义覆盖 (CSS Variables) --- */
+      /* 让 Waline 完美适配暗色主题 */
+      :root {
+        --waline-theme-color: #2997ff !important;
+        --waline-active-color: #007aff !important;
+        --waline-bgcolor: transparent !important;
+        --waline-bgcolor-light: rgba(255, 255, 255, 0.05) !important;
+        --waline-bgcolor-hover: rgba(255, 255, 255, 0.08) !important;
+        --waline-border-color: rgba(255, 255, 255, 0.1) !important;
+        --waline-disable-bgcolor: rgba(255, 255, 255, 0.05) !important;
+        --waline-disable-color: #666 !important;
+        --waline-code-bgcolor: #282c34 !important;
+        
+        /* 文字颜色 */
+        --waline-color: #e0e0e0 !important;
+        --waline-info-color: #888 !important;
       }
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      
+      /* 隐藏 Waline 版权信息 (可选) */
+      .wl-power { display: none !important; }
+
+      /* --- 动画关键帧 --- */
+      @keyframes easeEntry {
+        0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      @keyframes heartBeat {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.4); }
+        100% { transform: scale(1); }
+      }
+
+      /* 移动端适配 */
+      @media (max-width: 600px) {
+        body { padding: 20px 15px; }
+        .hero-img { height: 220px; }
+        h1 { font-size: 28px; }
+        .content { font-size: 17px; }
+        .comments-container { padding: 20px 15px; }
       }
     </style>
-    <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
   </head>
   <body>
-    <div class="nav-header">
-      <a href="index.html" class="back-btn">← Back to Home</a>
-    </div>
+    <nav class="container nav-header">
+      <a href="index.html" class="back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Home
+      </a>
+    </nav>
 
-    <article class="article-container">
+    <article class="container">
       <div class="hero-img"></div>
-      <h1>构建我的个人数字花园</h1>
-      <div class="meta">2025.12.03 · By CaoCao</div>
+      
+      <header>
+        <h1>构建我的个人数字花园</h1>
+        <div class="meta">
+          <span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            2025.12.03
+          </span>
+          <span>
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+             By CaoCao
+          </span>
+        </div>
+      </header>
 
       <div class="content">
         <p>假如我可以做一棵草。</p>
         <p>
-          我什么也没忘，但是有些事只适合收藏。不能说，也不能想，却又不能忘。它们不能变成语言，它们无法变成语言，一旦变成语言就不再是它们了。它们是一片朦胧的温馨与寂寥，是一片成熟的希望与绝望，它们的领地只有两处：心与坟墓。
+          我什么也没忘，但是有些事只适合收藏。不能说，也不能想，却又不能忘。它们不能变成语言，它们无法变成语言，一旦变成语言就不再是它们了。
+        </p>
+        <p>
+          它们是一片朦胧的温馨与寂寥，是一片成熟的希望与绝望，它们的领地只有两处：心与坟墓。
+        </p>
+        <p>
+            在这个快节奏的时代，我试图寻找一片属于自己的宁静之地。没有算法的推荐，没有社交的压力，只有纯粹的记录与思考。
         </p>
       </div>
 
       <div class="interaction-area">
-        <div class="like-btn-container">
+        <div class="like-wrapper">
           <button id="likeBtn" class="like-btn">
-            <span class="heart-icon">❤</span>
-            <span id="likeCount">赞 (0)</span>
+            <span class="heart-icon">♥</span>
+            <span id="likeText">喜欢这篇 (0)</span>
           </button>
         </div>
 
-        <div class="interaction-area" style="margin-top: 50px">
-          <h3>Comments</h3>
+        <div class="comments-container">
+          <div class="comments-title">Comments / 留言板</div>
           <div id="vcomments"></div>
         </div>
       </div>
     </article>
 
-    <script>
-      // --- 1. 点赞功能 (本地存储版) ---
-      const likeBtn = document.getElementById("likeBtn");
-      const likeCountLabel = document.getElementById("likeCount");
+    <script type="module">
+      // --- 1. Waline 评论系统集成 (核心功能) ---
+      import { init } from 'https://unpkg.com/@waline/client@v2/dist/waline.mjs';
 
-      // 初始化：检查是否点过赞
-      let likes = localStorage.getItem("blog_likes")
-        ? parseInt(localStorage.getItem("blog_likes"))
-        : 0;
-      let hasLiked = localStorage.getItem("blog_has_liked") === "true";
-
-      function updateLikeUI() {
-        likeCountLabel.innerText = hasLiked
-          ? `已赞 (${likes})`
-          : `赞 (${likes})`;
-        if (hasLiked) likeBtn.classList.add("active");
-      }
-      updateLikeUI();
-
-      likeBtn.addEventListener("click", () => {
-        if (!hasLiked) {
-          likes++;
-          hasLiked = true;
-          // 播放一个小动画效果
-          likeBtn.style.transform = "scale(1.2)";
-          setTimeout(() => (likeBtn.style.transform = "scale(1)"), 200);
-        } else {
-          likes--;
-          hasLiked = false;
-        }
-        // 保存数据
-        localStorage.setItem("blog_likes", likes);
-        localStorage.setItem("blog_has_liked", hasLiked);
-        updateLikeUI();
+      init({
+        el: '#vcomments',
+        // 🔴 这里已为您配置好后端地址，无需修改
+        serverURL: 'https://api.caocao.cloud', 
+        dark: 'body', // 自动适配页面深色模式
+        placeholder: '写下你的想法... (支持 Markdown)',
+        avatar: 'monsterid', // 头像风格
+        visitor: true,       // 开启阅读量统计
+        comment: true,       // 开启评论
+        emoji: [
+            'https://unpkg.com/@waline/emojis@1.1.0/weibo',
+            'https://unpkg.com/@waline/emojis@1.1.0/bilibili',
+        ],
       });
+    </script>
 
-      // --- 2. 评论功能 (本地存储版) ---
-      // --- 启动 Valine 云评论系统 ---
-      new Valine({
-        el: "#vcomments", // 对应上面的 id
-        appId: "AHBszRwf3p5quAVIfLiMa47w-MdYXbMMI", // 🔴 请去 LeanCloud 复制粘贴过来
-        appKey: "AHBszRwf3p5quAVIfLiMa47w-MdYXbMMI", // 🔴 请去 LeanCloud 复制粘贴过来
-        placeholder: "share your thoughts...", // 输入框占位符
-        avatar: "monsterid", // 头像风格 (可以是 mp, identicon, monsterid, wavatar)
-        visitor: true, // 阅读量统计
+    <script>
+      // --- 2. 点赞功能 (本地存储 + 动效) ---
+      document.addEventListener('DOMContentLoaded', () => {
+          const likeBtn = document.getElementById("likeBtn");
+          const likeText = document.getElementById("likeText");
+          const heartIcon = document.querySelector(".heart-icon");
+
+          // 读取本地存储
+          let likes = localStorage.getItem("blog_likes_01") // 建议为每篇文章加唯一ID后缀
+            ? parseInt(localStorage.getItem("blog_likes_01"))
+            : 0;
+          let hasLiked = localStorage.getItem("blog_has_liked_01") === "true";
+
+          // 更新 UI 函数
+          function updateLikeUI() {
+            likeText.innerText = hasLiked ? `已收藏 (${likes})` : `喜欢这篇 (${likes})`;
+            if (hasLiked) {
+                likeBtn.classList.add("active");
+                heartIcon.innerText = "❤"; // 实心
+            } else {
+                likeBtn.classList.remove("active");
+                heartIcon.innerText = "♥"; // 空心/普通
+            }
+          }
+          
+          // 初始化 UI
+          updateLikeUI();
+
+          // 点击事件
+          likeBtn.addEventListener("click", () => {
+            // 触觉反馈 (如果设备支持)
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            if (!hasLiked) {
+              likes++;
+              hasLiked = true;
+            } else {
+              likes--;
+              hasLiked = false;
+            }
+            
+            // 保存数据
+            localStorage.setItem("blog_likes_01", likes);
+            localStorage.setItem("blog_has_liked_01", hasLiked);
+            
+            updateLikeUI();
+          });
       });
     </script>
   </body>
